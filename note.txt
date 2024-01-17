@@ -1,0 +1,2 @@
+docker container setup:
+docker run --name tti-web-db -p 3306:3306 -e MYSQL_DATABASE=web-db -e MYSQL_ROOT_PASSWORD=eauu0244 -d mysql --default-authentication-plugin=mysql_native_password
