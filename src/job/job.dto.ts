@@ -1,13 +1,19 @@
+import { CameraEntity } from "src/camera/camera.entity";
+
 export class CreateJobParams {
     name: string;
-    camera: string;
+    jobPeriodStart: Date;
+    jobPeriodEnd: Date;
+    camera: CameraEntity;
  }
 
  export class UpdateJobParams {
     id: string;
     name: string;
     status: JobStatus;
-    camera: string;
+    jobPeriodStart: Date;
+    jobPeriodEnd: Date;
+    camera: CameraEntity;
  }
 
  export enum JobStatus {

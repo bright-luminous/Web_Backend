@@ -15,11 +15,11 @@ export class JobService {
   }
 
   async createJob(jobDetails: CreateJobParams) {
-    const newUser = this.jobRepository.create({
+    const newJob = this.jobRepository.create({
       ...jobDetails,
       createdAt: new Date(),
     });
-    return await this.jobRepository.save(newUser);
+    return await this.jobRepository.save(newJob);
   }
 
   async updateJob(updateJobDetails: UpdateJobParams) {
@@ -29,6 +29,8 @@ export class JobService {
       .set({
         name: updateJobDetails.name,
         status: updateJobDetails.status,
+        jobPeriodStart: updateJobDetails.jobPeriodStart,
+        jobPeriodEnd: updateJobDetails.jobPeriodEnd,
         camera: updateJobDetails.camera,
       })
       .where('id = :id', { id: updateJobDetails.id })

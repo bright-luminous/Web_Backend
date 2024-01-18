@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne } from "typeorm";
 import { JobStatus } from "./job.dto";
+import { CameraEntity } from "src/camera/camera.entity";
 
 @Entity({ name: 'jobs' })
 export class JobEntity {
@@ -17,8 +18,16 @@ export class JobEntity {
     })
     status: JobStatus
 
-    @Column()
-    camera: string;
+    @Column({ type: "timestamp" })
+    jobPeriodStart: Date;
+
+    @Column({ type: "timestamp" })
+    jobPeriodEnd: Date;
+
+    @ManyToOne((type) => CameraEntity, (cameraEntity) => cameraEntity.jobs, {
+        onDelete: 'CASCADE',
+    })
+    camera: CameraEntity;
 
     @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)" })
     createdAt: Date;
