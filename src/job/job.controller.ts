@@ -16,13 +16,13 @@ export class JobController {
         return this.jobService.createJob(createUserDto);
     }
 
-    @Put()
-    async updateUser(@Body() updateJobDto: UpdateJobParams) {
-        await this.jobService.updateJob(updateJobDto);
-    }
+    // @Put()
+    // async updateUser(@Body() updateJobDto: UpdateJobParams) {
+    //     await this.jobService.updateJob(updateJobDto);
+    // }
 
-    @Delete(':id')
-    async deleteUser(@Param('id') id: string) {
-        await this.jobService.deleteJob(id);
-    }
+    // @Delete(':id')
+    // async deleteUser(@Param('id') id: string) {
+    //     await this.jobService.deleteJob(id);
+    // }
 }

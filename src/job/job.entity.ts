@@ -1,15 +1,16 @@
 import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne } from "typeorm";
 import { JobStatus } from "./job.dto";
 import { CameraEntity } from "src/camera/camera.entity";
+import { CosmosPartitionKey } from "@nestjs/azure-database";
 
-@Entity({ name: 'jobs' })
+@CosmosPartitionKey('jobName')
 export class JobEntity {
 
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
     @Column()
-    name: string;
+    jobName: string;
 
     @Column({
         type: "enum",

@@ -1,11 +1,14 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { JobEntity } from './job.entity';
 import { JobController } from './job.controller';
 import { JobService } from './job.service';
+import { AzureCosmosDbModule } from '@nestjs/azure-database';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([JobEntity])],
+    imports: [AzureCosmosDbModule.forFeature([{
+        collection: 'jobContainer1',
+        dto: JobEntity
+    }])],
     controllers: [JobController],
     providers: [JobService]
 })
