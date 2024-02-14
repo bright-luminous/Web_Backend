@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
 import { JobService } from './job.service';
 import { CreateJobParams, UpdateJobParams } from './job.dto';
 
@@ -16,13 +16,14 @@ export class JobController {
         return this.jobService.createJob(createUserDto);
     }
 
-    // @Put()
-    // async updateUser(@Body() updateJobDto: UpdateJobParams) {
-    //     await this.jobService.updateJob(updateJobDto);
-    // }
+    @Put()
+    async updateUser(@Body() updateJobDto: UpdateJobParams) {
+        return await this.jobService.updateJob(updateJobDto);
+    }
 
-    // @Delete(':id')
-    // async deleteUser(@Param('id') id: string) {
-    //     await this.jobService.deleteJob(id);
-    // }
+    @Delete()
+    async deleteUser(@Query('id') id: string) {
+        const ret = await this.jobService.deleteJob(id);
+        return ret
+    }
 }

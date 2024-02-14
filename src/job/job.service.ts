@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JobEntity } from './job.entity';
 import { Repository } from 'typeorm';
-import { CreateJobParams, ReturnJob, UpdateJobParams } from './job.dto';
+import { CreateJobParams, JobStatus, ReturnJob, UpdateJobParams } from './job.dto';
 import { Container } from '@azure/cosmos';
 import { InjectModel } from '@nestjs/azure-database';
 
@@ -14,7 +14,7 @@ export class JobService {
   ) {}
 
   async getJobs() {
-    var sqlQuery = 'select * from jobContainer';
+    var sqlQuery = 'select * from jobContainer1';
 
     var consmosResults = await this.jobContainer?.items
       ?.query<JobEntity>(sqlQuery)
@@ -37,6 +37,7 @@ export class JobService {
   async createJob(jobDetails: CreateJobParams) {
     var newJob = new JobEntity();
     newJob.jobName = jobDetails.jobName;
+    newJob.status = JobStatus.WAITING;
     newJob.jobPeriodStart = jobDetails.jobPeriodStart;
     newJob.jobPeriodEnd = jobDetails.jobPeriodEnd;
     newJob.camera = jobDetails.camera;
@@ -46,24 +47,23 @@ export class JobService {
     return resource;
   }
 
-  // async updateJob(updateJobDetails: UpdateJobParams) {
-  //   await this.jobRepository
-  //     .createQueryBuilder()
-  //     .update(JobEntity)
-  //     .set({
-  //       name: updateJobDetails.name,
-  //       status: updateJobDetails.status,
-  //       jobPeriodStart: updateJobDetails.jobPeriodStart,
-  //       jobPeriodEnd: updateJobDetails.jobPeriodEnd,
-  //       camera: updateJobDetails.camera,
-  //     })
-  //     .where('id = :id', { id: updateJobDetails.id })
-  //     .execute();
+  async updateJob(updateJobDetails: UpdateJobParams) {
+    var { resource } = await this.jobContainer
+      .item(updateJobDetails.id, updateJobDetails.id)
+      .patch({
+        // condition: `FROM Job j WHERE j.id = ${updateJobDetails.id}`,
+        operations: [
+          { op: 'set', path: '/jobName', value: updateJobDetails.jobName },
+          { op: 'set', path: '/status', value: updateJobDetails.status },
+          { op: 'set', path: '/camera', value: updateJobDetails.camera },
+        ],
+      });
 
-  //   return this.jobRepository.findBy({ id: updateJobDetails.id });
-  // }
+    return resource;
+  }
 
-  // async deleteJob(id: string) {
-  //   return await this.jobRepository.delete(id);
-  // }
+  async deleteJob(id: string) {
+    const ret = await this.jobContainer.item(id, id).delete();
+    return ret.item.id;
+  }
 }

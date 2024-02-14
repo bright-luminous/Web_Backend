@@ -11,8 +11,6 @@ export class CreateJobParams {
     id: string;
     jobName: string;
     status: JobStatus;
-    jobPeriodStart: Date;
-    jobPeriodEnd: Date;
     camera: CameraEntity;
  }
 

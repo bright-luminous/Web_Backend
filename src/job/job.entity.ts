@@ -3,7 +3,7 @@ import { JobStatus } from "./job.dto";
 import { CameraEntity } from "src/camera/camera.entity";
 import { CosmosPartitionKey } from "@nestjs/azure-database";
 
-@CosmosPartitionKey('jobName')
+@CosmosPartitionKey('id')
 export class JobEntity {
 
     @PrimaryGeneratedColumn("uuid")
