@@ -1,7 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { JobEntity } from './job.entity';
-import { Repository } from 'typeorm';
 import { CreateJobParams, JobStatus, ReturnJob, UpdateJobParams } from './job.dto';
 import { Container } from '@azure/cosmos';
 import { InjectModel } from '@nestjs/azure-database';
@@ -9,7 +7,6 @@ import { InjectModel } from '@nestjs/azure-database';
 @Injectable()
 export class JobService {
   constructor(
-    // @InjectRepository(JobEntity) private jobRepository: Repository<JobEntity>,
     @InjectModel(JobEntity) private readonly jobContainer: Container,
   ) {}
 
@@ -51,7 +48,6 @@ export class JobService {
     var { resource } = await this.jobContainer
       .item(updateJobDetails.id, updateJobDetails.id)
       .patch({
-        // condition: `FROM Job j WHERE j.id = ${updateJobDetails.id}`,
         operations: [
           { op: 'set', path: '/jobName', value: updateJobDetails.jobName },
           { op: 'set', path: '/status', value: updateJobDetails.status },

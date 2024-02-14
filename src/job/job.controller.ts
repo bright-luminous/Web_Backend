@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, Put, Query } from '@nestjs/common';
 import { JobService } from './job.service';
 import { CreateJobParams, UpdateJobParams } from './job.dto';
 
