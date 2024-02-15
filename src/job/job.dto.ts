@@ -1,32 +1,54 @@
-import { CameraEntity } from "src/camera/camera.entity";
+import { CameraEntity } from 'src/camera/camera.entity';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsArray, IsEnum, IsNumber, IsOptional } from 'class-validator';
 
 export class CreateJobParams {
-    jobName: string;
-    jobPeriodStart: Date;
-    jobPeriodEnd: Date;
-    camera: CameraEntity;
- }
-
- export class UpdateJobParams {
-    id: string;
-    jobName: string;
-    status: JobStatus;
-    camera: CameraEntity;
- }
-
- export class ReturnJob {
-   id: string;
-   jobName: string;
-   status: JobStatus;
-   jobPeriodStart: Date;
-   jobPeriodEnd: Date;
-   camera: CameraEntity;
-   createdAt: Date;
-   updatedDate: Date
+  jobName: string;
+  jobPeriodStart: Date;
+  jobPeriodEnd: Date;
+  camera: CameraEntity;
 }
 
- export enum JobStatus {
-    WAITING = "waiting",
-    WORKING = "working",
-    DONE = "done",
+export class UpdateJobParams {
+  id: string;
+  jobName: string;
+  status: JobStatus;
+  camera: CameraEntity;
+}
+
+export class ReturnJob {
+  id: string;
+  jobName: string;
+  status: JobStatus;
+  jobPeriodStart: Date;
+  jobPeriodEnd: Date;
+  camera: CameraEntity;
+  createdAt: Date;
+  updatedDate: Date;
+}
+
+export enum JobStatus {
+  WAITING = 'waiting',
+  WORKING = 'working',
+  DONE = 'done',
+}
+
+export enum SortOrder {
+  ASC = 'ASC',
+  DESC = 'DESC',
+}
+
+export class PageFilter {
+  @IsNumber({}, { message: ' "page" atrribute should be a number' })
+  public page: number;
+
+  @IsNumber({}, { message: ' "pageSize" attribute should be a number ' })
+  public pageSize: number;
+
+  @IsOptional()
+  public orderBy?: string;
+
+  @IsEnum(SortOrder)
+  @IsOptional()
+  public sortOrder?: SortOrder = SortOrder.DESC;
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JobEntity } from './job.entity';
-import { CreateJobParams, JobStatus, ReturnJob, UpdateJobParams } from './job.dto';
+import { CreateJobParams, JobStatus, PageFilter, ReturnJob, UpdateJobParams } from './job.dto';
 import { Container } from '@azure/cosmos';
 import { InjectModel } from '@nestjs/azure-database';
 
@@ -31,7 +31,7 @@ export class JobService {
     return final;
   }
 
-  async getJobByID(id) {
+  async getJobByID(id: string) {
     var sqlQuery = `SELECT * FROM jobContainer1 j WHERE j.id="${id}"`;
 
     var consmosResults = await this.jobContainer?.items
@@ -52,8 +52,32 @@ export class JobService {
     return final;
   }
 
-  async getJobByNameLike(jobName) {
-    var sqlQuery = `SELECT * FROM jobContainer1 j WHERE j.jobName LIKE "%${jobName}%"`;
+  async getJobByNameLike(jobName: string) {
+    var sqlQuery = `SELECT top 5 * FROM jobContainer1 j WHERE j.jobName LIKE "%${jobName}%"`;
+
+    var consmosResults = await this.jobContainer?.items
+      ?.query<JobEntity>(sqlQuery)
+      .fetchAll();
+    var final = consmosResults.resources.map<ReturnJob>((value) => {
+      return {
+        id: value.id,
+        jobName: value.jobName,
+        status: value.status,
+        jobPeriodStart: value.jobPeriodStart,
+        jobPeriodEnd: value.jobPeriodEnd,
+        camera: value.camera,
+        createdAt: value.createdAt,
+        updatedDate: value.updatedDate,
+      };
+    });
+    return final;
+  }
+
+  async getJobAsPages(pageFilter: PageFilter) {
+    pageFilter.page = pageFilter.page - 1;
+    const offset = pageFilter.page * pageFilter.pageSize;
+    const limit = pageFilter.pageSize;
+    var sqlQuery = `SELECT * FROM jobContainer1 j OFFSET ${offset} LIMIT ${limit}`;
 
     var consmosResults = await this.jobContainer?.items
       ?.query<JobEntity>(sqlQuery)
