@@ -31,6 +31,48 @@ export class JobService {
     return final;
   }
 
+  async getJobByID(id) {
+    var sqlQuery = `SELECT * FROM jobContainer1 j WHERE j.id="${id}"`;
+
+    var consmosResults = await this.jobContainer?.items
+      ?.query<JobEntity>(sqlQuery)
+      .fetchAll();
+    var final = consmosResults.resources.map<ReturnJob>((value) => {
+      return {
+        id: value.id,
+        jobName: value.jobName,
+        status: value.status,
+        jobPeriodStart: value.jobPeriodStart,
+        jobPeriodEnd: value.jobPeriodEnd,
+        camera: value.camera,
+        createdAt: value.createdAt,
+        updatedDate: value.updatedDate,
+      };
+    });
+    return final;
+  }
+
+  async getJobByNameLike(jobName) {
+    var sqlQuery = `SELECT * FROM jobContainer1 j WHERE j.jobName LIKE "%${jobName}%"`;
+
+    var consmosResults = await this.jobContainer?.items
+      ?.query<JobEntity>(sqlQuery)
+      .fetchAll();
+    var final = consmosResults.resources.map<ReturnJob>((value) => {
+      return {
+        id: value.id,
+        jobName: value.jobName,
+        status: value.status,
+        jobPeriodStart: value.jobPeriodStart,
+        jobPeriodEnd: value.jobPeriodEnd,
+        camera: value.camera,
+        createdAt: value.createdAt,
+        updatedDate: value.updatedDate,
+      };
+    });
+    return final;
+  }
+
   async createJob(jobDetails: CreateJobParams) {
     var newJob = new JobEntity();
     newJob.jobName = jobDetails.jobName;

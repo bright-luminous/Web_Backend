@@ -11,6 +11,16 @@ export class JobController {
         return this.jobService.getJobs();
     }
 
+    @Get('byID')
+    getUserByID(@Query('id') id: string) {
+        return this.jobService.getJobByID(id);
+    }
+
+    @Get('nameLike')
+    getUserNameLike(@Query('jobName') jobName: string) {
+        return this.jobService.getJobByNameLike(jobName);
+    }
+
     @Post()
     createUser(@Body() createUserDto: CreateJobParams) {
         return this.jobService.createJob(createUserDto);
