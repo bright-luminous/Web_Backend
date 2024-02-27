@@ -82,10 +82,10 @@ export class JobService {
     return final;
   }
 
-  async getJobAsPages(pageFilter: PageFilter) {
-    pageFilter.page = pageFilter.page - 1;
-    const offset = pageFilter.page * pageFilter.pageSize;
-    const limit = pageFilter.pageSize;
+  async getJobAsPages(page: number, pageSize: number) {
+    page = page - 1;
+    const offset = page * pageSize;
+    const limit = pageSize;
     var sqlQuery = `SELECT * FROM jobContainer1 j OFFSET ${offset} LIMIT ${limit}`;
 
     var consmosResults = await this.jobContainer?.items

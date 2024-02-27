@@ -44,7 +44,7 @@ export enum SortOrder {
 }
 
 export class PageFilter {
-  @IsNumber({}, { message: ' "page" atrribute should be a number' })
+  @IsNumber({}, { message: ' "page" attribute should be a number' })
   public page: number;
 
   @IsNumber({}, { message: ' "pageSize" attribute should be a number ' })

@@ -27,8 +27,8 @@ export class JobController {
     }
 
     @Get('asPage')
-    getJobAsPage(@Body() pageFilter: PageFilter) {
-        return this.jobService.getJobAsPages(pageFilter);
+    getJobAsPage(@Query('page') page: number, @Query('pageSize') pageSize: number) {
+        return this.jobService.getJobAsPages(page,pageSize);
     }
 
     @Post()
