@@ -24,6 +24,7 @@ export class JobService {
         jobPeriodStart: value.jobPeriodStart,
         jobPeriodEnd: value.jobPeriodEnd,
         camera: value.camera,
+        description: value.description,
         results: value.results
       };
     });
@@ -44,6 +45,7 @@ export class JobService {
         jobPeriodStart: value.jobPeriodStart,
         jobPeriodEnd: value.jobPeriodEnd,
         camera: value.camera,
+        description: value.description,
         results: value.results
       };
     });
@@ -76,6 +78,7 @@ export class JobService {
         jobPeriodStart: value.jobPeriodStart,
         jobPeriodEnd: value.jobPeriodEnd,
         camera: value.camera,
+        description: value.description,
         results: value.results
       };
     });
@@ -99,6 +102,7 @@ export class JobService {
         jobPeriodStart: value.jobPeriodStart,
         jobPeriodEnd: value.jobPeriodEnd,
         camera: value.camera,
+        description: value.description,
         results: value.results
       };
     });
@@ -111,6 +115,7 @@ export class JobService {
     newJob.status = JobStatus.WAITING;
     newJob.jobPeriodStart = jobDetails.jobPeriodStart;
     newJob.jobPeriodEnd = jobDetails.jobPeriodEnd;
+    newJob.description = jobDetails.description;
     newJob.camera = jobDetails.camera;
 
     var { resource } = await this.jobContainer.items.create(newJob);
@@ -133,7 +138,6 @@ export class JobService {
   }
 
   async updateJobResultLink(updateJobDetails: UpdateJobResultLinkParams) {
-    console.log(updateJobDetails)
     var { resource } = await this.jobContainer
       .item(updateJobDetails.id, updateJobDetails.id)
       .patch({

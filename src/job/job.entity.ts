@@ -28,6 +28,9 @@ export class JobEntity {
     @Column({ type: "string" })
     camera: CameraEntity;
 
+    @Column({ type: "string" })
+    description: string;
+
     @Column("string", { array: true })
     results: String[];
 }

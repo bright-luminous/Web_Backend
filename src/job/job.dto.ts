@@ -7,6 +7,7 @@ export class CreateJobParams {
   jobPeriodStart: Date;
   jobPeriodEnd: Date;
   camera: CameraEntity;
+  description: string;
 }
 
 export class UpdateJobParams {
