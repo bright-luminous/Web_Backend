@@ -50,6 +50,18 @@ export class JobService {
     return final;
   }
 
+  async getJobStatus(id: string) {
+    var sqlQuery = `SELECT VALUE {
+      id: j.id,
+      status: j.status
+    } FROM jobContainer1 j WHERE j.id="${id}"`;
+    var consmosResults = await this.jobContainer?.items
+      ?.query<JobEntity>(sqlQuery)
+      .fetchAll();
+
+    return consmosResults.resources;
+  }
+
   async getJobByNameLike(jobName: string) {
     var sqlQuery = `SELECT top 5 * FROM jobContainer1 j WHERE j.jobName LIKE "%${jobName}%"`;
 
