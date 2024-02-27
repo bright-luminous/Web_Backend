@@ -16,6 +16,11 @@ export class UpdateJobParams {
   camera: CameraEntity;
 }
 
+export class UpdateJobResultLinkParams {
+  id: string;
+  resultLinks: string[];
+}
+
 export class ReturnJob {
   id: string;
   jobName: string;

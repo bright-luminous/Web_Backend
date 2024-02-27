@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Post, Put, Query } from '@nestjs/common';
 import { JobService } from './job.service';
-import { CreateJobParams, PageFilter, UpdateJobParams } from './job.dto';
+import { CreateJobParams, PageFilter, UpdateJobParams, UpdateJobResultLinkParams } from './job.dto';
 
 @Controller('job')
 export class JobController {
@@ -34,6 +34,11 @@ export class JobController {
     @Put()
     async updateJob(@Body() updateJobDto: UpdateJobParams) {
         return await this.jobService.updateJob(updateJobDto);
+    }
+
+    @Put('updateLink')
+    async updateJobResultLink(@Body() updateJobLinkDto: UpdateJobResultLinkParams) {
+        return await this.jobService.updateJobResultLink(updateJobLinkDto);
     }
 
     @Delete()

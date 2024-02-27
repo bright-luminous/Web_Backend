@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JobEntity } from './job.entity';
-import { CreateJobParams, JobStatus, PageFilter, ReturnJob, UpdateJobParams } from './job.dto';
+import { CreateJobParams, JobStatus, PageFilter, ReturnJob, UpdateJobParams, UpdateJobResultLinkParams } from './job.dto';
 import { Container } from '@azure/cosmos';
 import { InjectModel } from '@nestjs/azure-database';
 
@@ -114,6 +114,19 @@ export class JobService {
           { op: 'set', path: '/jobName', value: updateJobDetails.jobName },
           { op: 'set', path: '/status', value: updateJobDetails.status },
           { op: 'set', path: '/camera', value: updateJobDetails.camera },
+        ],
+      });
+
+    return resource;
+  }
+
+  async updateJobResultLink(updateJobDetails: UpdateJobResultLinkParams) {
+    console.log(updateJobDetails)
+    var { resource } = await this.jobContainer
+      .item(updateJobDetails.id, updateJobDetails.id)
+      .patch({
+        operations: [
+          { op: 'add', path: '/results', value: updateJobDetails.resultLinks },
         ],
       });
 
