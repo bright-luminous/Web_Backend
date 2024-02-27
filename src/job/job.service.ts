@@ -24,8 +24,7 @@ export class JobService {
         jobPeriodStart: value.jobPeriodStart,
         jobPeriodEnd: value.jobPeriodEnd,
         camera: value.camera,
-        createdAt: value.createdAt,
-        updatedDate: value.updatedDate,
+        results: value.results
       };
     });
     return final;
@@ -45,8 +44,7 @@ export class JobService {
         jobPeriodStart: value.jobPeriodStart,
         jobPeriodEnd: value.jobPeriodEnd,
         camera: value.camera,
-        createdAt: value.createdAt,
-        updatedDate: value.updatedDate,
+        results: value.results
       };
     });
     return final;
@@ -66,8 +64,7 @@ export class JobService {
         jobPeriodStart: value.jobPeriodStart,
         jobPeriodEnd: value.jobPeriodEnd,
         camera: value.camera,
-        createdAt: value.createdAt,
-        updatedDate: value.updatedDate,
+        results: value.results
       };
     });
     return final;
@@ -90,8 +87,7 @@ export class JobService {
         jobPeriodStart: value.jobPeriodStart,
         jobPeriodEnd: value.jobPeriodEnd,
         camera: value.camera,
-        createdAt: value.createdAt,
-        updatedDate: value.updatedDate,
+        results: value.results
       };
     });
     return final;

@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne } from "typeorm";
+import { Column, PrimaryGeneratedColumn } from "typeorm";
 import { JobStatus } from "./job.dto";
 import { CameraEntity } from "src/camera/camera.entity";
 import { CosmosPartitionKey } from "@nestjs/azure-database";
@@ -25,15 +25,9 @@ export class JobEntity {
     @Column({ type: "timestamp" })
     jobPeriodEnd: Date;
 
-    @ManyToOne((type) => CameraEntity, (cameraEntity) => cameraEntity.jobs, {
-        onDelete: 'CASCADE',
-    })
+    @Column({ type: "string" })
     camera: CameraEntity;
 
-    @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)" })
-    createdAt: Date;
-
-    @UpdateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)", onUpdate: "CURRENT_TIMESTAMP(6)" })
-    updatedDate: Date
-
+    @Column("string", { array: true })
+    results: String[];
 }

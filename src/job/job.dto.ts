@@ -23,14 +23,14 @@ export class ReturnJob {
   jobPeriodStart: Date;
   jobPeriodEnd: Date;
   camera: CameraEntity;
-  createdAt: Date;
-  updatedDate: Date;
+  results: String[];
 }
 
 export enum JobStatus {
   WAITING = 'waiting',
   WORKING = 'working',
   DONE = 'done',
+  FAILED = 'failed',
 }
 
 export enum SortOrder {
