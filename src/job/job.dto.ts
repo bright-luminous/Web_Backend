@@ -51,6 +51,9 @@ export class PageFilter {
   @IsNumber({}, { message: ' "pageSize" attribute should be a number ' })
   public pageSize: number;
 
+  @IsNumber({}, { message: ' "totalEntry" attribute should be a number ' })
+  public totalEntry: number;
+
   @IsOptional()
   public orderBy?: string;
 

@@ -1,6 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { JobEntity } from './job.entity';
-import { CreateJobParams, JobStatus, PageFilter, ReturnJob, UpdateJobParams, UpdateJobResultLinkParams } from './job.dto';
+import {
+  CreateJobParams,
+  JobStatus,
+  PageFilter,
+  ReturnJob,
+  UpdateJobParams,
+  UpdateJobResultLinkParams,
+} from './job.dto';
 import { Container } from '@azure/cosmos';
 import { InjectModel } from '@nestjs/azure-database';
 
@@ -25,10 +32,10 @@ export class JobService {
         jobPeriodEnd: value.jobPeriodEnd,
         camera: value.camera,
         description: value.description,
-        results: value.results
+        results: value.results,
       };
     });
-    return final;
+    return {data:final, totalCount: consmosResults.resources.length};
   }
 
   async getJobByID(id: string) {
@@ -46,7 +53,7 @@ export class JobService {
         jobPeriodEnd: value.jobPeriodEnd,
         camera: value.camera,
         description: value.description,
-        results: value.results
+        results: value.results,
       };
     });
     return final;
@@ -79,7 +86,7 @@ export class JobService {
         jobPeriodEnd: value.jobPeriodEnd,
         camera: value.camera,
         description: value.description,
-        results: value.results
+        results: value.results,
       };
     });
     return final;
@@ -103,7 +110,7 @@ export class JobService {
         jobPeriodEnd: value.jobPeriodEnd,
         camera: value.camera,
         description: value.description,
-        results: value.results
+        results: value.results,
       };
     });
     return final;
