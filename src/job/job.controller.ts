@@ -36,6 +36,11 @@ export class JobController {
         return this.jobService.getJobAsPages(page,pageSize);
     }
 
+    @Get('trigger')
+    getJobQuery(@Query('clientId') clientId: string, @Query('jobID') jobID: string) {
+        return this.jobService.jobQuery(clientId,jobID);
+    }
+
     @Post()
     createJob(@Body() createUserDto: CreateJobParams) {
         return this.jobService.createJob(createUserDto);

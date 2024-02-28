@@ -11,6 +11,7 @@ import {
 } from './job.dto';
 import { Container } from '@azure/cosmos';
 import { InjectModel } from '@nestjs/azure-database';
+import axios from 'axios';
 
 @Injectable()
 export class JobService {
@@ -36,7 +37,7 @@ export class JobService {
         results: value.results,
       };
     });
-    return {data:final, totalCount: consmosResults.resources.length};
+    return { data: final, totalCount: consmosResults.resources.length };
   }
 
   async getJobByID(id: string) {
@@ -122,7 +123,39 @@ export class JobService {
         results: value.results,
       };
     });
-    return {data:final, totalCount: (await this.getJobCount()).resources[0]};
+    return { data: final, totalCount: (await this.getJobCount()).resources[0] };
+  }
+
+  async jobQuery(inputClientId: string, jobID: string) {
+    const uri = 'https://tps-func-test.azurewebsites.net/api/query';
+    try {
+      const response = await axios.post(uri, {
+        params: {
+          clientId: inputClientId,
+        },
+      });
+      // return response.data;
+    } catch (error) {
+      // console.log(error.response.config)
+      // return error;
+    }
+    const mockData = [
+      { score: 37, source: '205e4c6d-372f-4a13-a2f3-2f1f1f1f1f1f.jpg' },
+      { score: 82, source: '8234234e-f123-4234-234f-234234234234.jpg' },
+      { score: 15, source: '15151515-5151-5151-1515-151515151515.jpg' },
+      { score: 61, source: '61616161-6161-6161-6161-616161616161.jpg' },
+      { score: 99, source: '99999999-9999-9999-9999-999999999999.jpg' },
+    ];
+    const sortByScore = (a, b) => b.score - a.score;
+    const sortedByScoreMock = mockData.sort(sortByScore);
+    const topThree = sortedByScoreMock.slice(0,3);
+    const imagesSource = topThree.map((data)=>`https://blobhell.blob.core.windows.net/pictures/${inputClientId}/${data.source}`);
+
+    await this.updateJobResultLink({id: jobID,resultLinks: imagesSource})
+
+    return imagesSource;
+    // https://blobhell.blob.core.windows.net/pictures/gay_sex/0e8c3785-7bb6-4265-ac02-38c21b398f4f.jpg
+    // url/pictures/clientID/source
   }
 
   async createJob(jobDetails: CreateJobParams) {
@@ -135,6 +168,8 @@ export class JobService {
     newJob.camera = jobDetails.camera;
 
     var { resource } = await this.jobContainer.items.create(newJob);
+
+    this.jobQuery('gay_sex',resource.id)
 
     return resource;
   }

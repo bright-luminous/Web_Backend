@@ -1,12 +1,10 @@
-import { CameraEntity } from 'src/camera/camera.entity';
-import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsEnum, IsNumber, IsOptional } from 'class-validator';
 
 export class CreateJobParams {
   jobName: string;
   jobPeriodStart: Date;
   jobPeriodEnd: Date;
-  camera: CameraEntity;
+  camera: string;
   description: string;
 }
 
@@ -14,7 +12,7 @@ export class UpdateJobParams {
   id: string;
   jobName: string;
   status: JobStatus;
-  camera: CameraEntity;
+  camera: string;
 }
 
 export class UpdateJobStatusParams {
@@ -33,7 +31,7 @@ export class ReturnJob {
   status: JobStatus;
   jobPeriodStart: Date;
   jobPeriodEnd: Date;
-  camera: CameraEntity;
+  camera: string;
   results: String[];
 }
 

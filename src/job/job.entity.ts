@@ -1,6 +1,5 @@
 import { Column, PrimaryGeneratedColumn } from "typeorm";
 import { JobStatus } from "./job.dto";
-import { CameraEntity } from "src/camera/camera.entity";
 import { CosmosPartitionKey } from "@nestjs/azure-database";
 
 @CosmosPartitionKey('id')
@@ -26,7 +25,7 @@ export class JobEntity {
     jobPeriodEnd: Date;
 
     @Column({ type: "string" })
-    camera: CameraEntity;
+    camera: string;
 
     @Column({ type: "string" })
     description: string;
