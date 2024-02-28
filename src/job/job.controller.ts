@@ -21,6 +21,11 @@ export class JobController {
         return this.jobService.getJobStatus(id);
     }
 
+    @Get('count')
+    getJobCount() {
+        return this.jobService.getJobCount();
+    }
+
     @Get('nameLike')
     getJobNameLike(@Query('jobName') jobName: string) {
         return this.jobService.getJobByNameLike(jobName);

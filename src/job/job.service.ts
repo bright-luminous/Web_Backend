@@ -71,6 +71,14 @@ export class JobService {
     return consmosResults.resources;
   }
 
+  async getJobCount() {
+    var sqlQuery = `SELECT VALUE COUNT(j.id) FROM jobContainer1 j`;
+    var consmosResults = await this.jobContainer?.items
+      ?.query<JobEntity>(sqlQuery)
+      .fetchAll();
+    return consmosResults;
+  }
+
   async getJobByNameLike(jobName: string) {
     var sqlQuery = `SELECT top 5 * FROM jobContainer1 j WHERE j.jobName LIKE "%${jobName}%"`;
 
@@ -113,7 +121,7 @@ export class JobService {
         results: value.results,
       };
     });
-    return final;
+    return {data:final, totalCount: (await this.getJobCount()).resources[0]};
   }
 
   async createJob(jobDetails: CreateJobParams) {
