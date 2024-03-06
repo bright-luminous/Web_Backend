@@ -62,10 +62,11 @@ export class JobController {
 
   @Get('trigger')
   getJobQuery(
+    @Query('description') description: string,
     @Query('clientId') clientId: string,
     @Query('jobID') jobID: string,
   ) {
-    return this.jobService.jobQuery(clientId, jobID);
+    return this.jobService.jobQuery(description, clientId, jobID);
   }
 
   @Get('pics')

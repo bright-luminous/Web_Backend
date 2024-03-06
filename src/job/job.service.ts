@@ -184,36 +184,22 @@ export class JobService {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
-  async jobQuery(inputClientId: string, jobID: string) {
-    const uri = 'https://tps-func-test.azurewebsites.net/api/query';
-    try {
-      const response = await axios.post(uri, {
+  async jobQuery(inputDescription: string, inputClientId: string, jobID: string) {
+    const uri = `https://tps-func-test.azurewebsites.net/api/query`;
+
+      const response = await axios.get(uri,{
         params: {
           clientId: inputClientId,
+          description: inputDescription
         },
       });
-      // return response.data;
-    } catch (error) {
-      // console.log(error.response.config)
-      // return error;
-    }
-    const mockData = [
-      { score: 37, source: '0e8c3785-7bb6-4265-ac02-38c21b398f4f.jpg' },
-      { score: 82, source: '1e3f8cb4-0b94-4312-8ff8-ad91cec3552b.jpg' },
-      { score: 15, source: '41fbc14a-207d-4fc9-8ec1-fc166560c589.jpg' },
-      { score: 61, source: '4a2573da-c4d8-4cd8-ac4f-ae4f966fb2e2.jpg' },
-      { score: 99, source: '53c4cd45-01ff-4bfa-999b-ee18b04a0da1.jpg' },
-      { score: 85, source: '71365478-211c-4e18-9851-eb9b9040e4fe.jpg' },
-      { score: 11, source: '81957342-b67d-4cd4-9c64-e88cdcb921b8.jpg' },
-      { score: 67, source: 'b4ba1e55-d2cb-44e7-a167-6b3fbc022608.jpg' },
-    ];
     const sortByScore = (a: { score: number }, b: { score: number }) =>
       b.score - a.score;
-    const sortedByScoreMock = mockData.sort(sortByScore);
+    const sortedByScoreMock = response.data.sort(sortByScore);
     const topThree = sortedByScoreMock.slice(0, 3);
     const imagesSource = topThree.map(
       (data) =>
-        `https://blobhell.blob.core.windows.net/pictures/${inputClientId}/${data.source}`,
+        `https://blobhell.blob.core.windows.net/pictures/${data.source}`,
     );
 
     await this.updateJobResultLink({ id: jobID, resultLinks: imagesSource });
@@ -234,7 +220,7 @@ export class JobService {
 
     var { resource } = await this.jobContainer.items.create(newJob);
 
-    this.jobQuery('gay_sex', resource.id);
+    this.jobQuery(jobDetails.description ,'gay_sex', resource.id);
 
     return resource;
   }
