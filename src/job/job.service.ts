@@ -220,7 +220,7 @@ export class JobService {
 
     var { resource } = await this.jobContainer.items.create(newJob);
 
-    this.jobQuery(jobDetails.description ,'gay_sex', resource.id);
+    this.jobQuery(jobDetails.description ,jobDetails.camera, resource.id);
 
     return resource;
   }
