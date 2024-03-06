@@ -165,7 +165,7 @@ export class JobService {
     }
 
     const zip = new JSZip();
-      const img = zip.folder("sample-0a0559e1-599c-4aa6-92e0-5f195101d902");
+      const img = zip.folder(`sample-${queryId}`);
       for (const image of imgNames) {
         const imageData = readFileSync(image);
         img.file(image, imageData);
