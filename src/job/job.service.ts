@@ -3,7 +3,6 @@ import { JobEntity } from './job.entity';
 import {
   CreateJobParams,
   JobStatus,
-  PageFilter,
   ReturnJob,
   UpdateJobParams,
   UpdateJobResultLinkParams,
@@ -12,6 +11,15 @@ import {
 import { Container } from '@azure/cosmos';
 import { InjectModel } from '@nestjs/azure-database';
 import axios from 'axios';
+import { BlobServiceClient } from '@azure/storage-blob';
+import {
+  createWriteStream,
+  mkdirSync,
+  readFileSync,
+  rmSync,
+} from 'fs';
+import { v4 } from 'uuid';
+import * as JSZip from 'jszip';
 
 @Injectable()
 export class JobService {
@@ -46,7 +54,7 @@ export class JobService {
     var consmosResults = await this.jobContainer?.items
       ?.query<JobEntity>(sqlQuery)
       .fetchAll();
-    var final = consmosResults.resources.map<ReturnJob>((value) => {
+    var final = await consmosResults.resources.map<ReturnJob>((value) => {
       return {
         id: value.id,
         jobName: value.jobName,
@@ -126,6 +134,56 @@ export class JobService {
     return { data: final, totalCount: (await this.getJobCount()).resources[0] };
   }
 
+  async getResultPic(jobID: string) {
+    var sqlQuery = `SELECT * FROM jobContainer1 j WHERE j.id="${jobID}"`;
+
+    var consmosResults = await this.jobContainer?.items
+      ?.query<JobEntity>(sqlQuery)
+      .fetchAll();
+
+    var urlArr = consmosResults.resources[0].results;
+    let splitUrlArr = [];
+    for await (const source of urlArr) {
+      splitUrlArr.push(source.split('/'));
+    }
+    const containerName = splitUrlArr[0][3];
+
+    const queryId = v4();
+    mkdirSync(`sample-${queryId}`);
+
+    const connStr =
+      'DefaultEndpointsProtocol=https;AccountName=blobhell;AccountKey=Zhj7QSoSXa+yWavz9BBH23zhwLV/oI1cUhbos70j1Dm38bclGOufBrQ9PuZjimICFlcYW3/+AzQE+AStiCZ2Xw==;EndpointSuffix=core.windows.net';
+    const blobServiceClient = BlobServiceClient.fromConnectionString(connStr);
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+
+    let imgNames = [];
+
+    for await (const item of splitUrlArr) {
+      const blobClient = containerClient.getBlobClient(`${item[4]}/${item[5]}`);
+      await blobClient.downloadToFile(`sample-${queryId}/${item[5]}`);
+      imgNames.push(`sample-${queryId}/${item[5]}`);
+    }
+
+    const zip = new JSZip();
+      const img = zip.folder("sample-0a0559e1-599c-4aa6-92e0-5f195101d902");
+      for (const image of imgNames) {
+        const imageData = readFileSync(image);
+        img.file(image, imageData);
+      }
+      zip
+        .generateNodeStream({ type: 'nodebuffer', streamFiles: true })
+        .pipe(createWriteStream(`zipArchive/sample-${queryId}.zip`))
+
+      rmSync(`sample-${queryId}`, { recursive: true, force: true });
+      await this.sleep(1000);
+      return `sample-${queryId}`;
+
+  }
+
+  sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
   async jobQuery(inputClientId: string, jobID: string) {
     const uri = 'https://tps-func-test.azurewebsites.net/api/query';
     try {
@@ -140,18 +198,25 @@ export class JobService {
       // return error;
     }
     const mockData = [
-      { score: 37, source: '205e4c6d-372f-4a13-a2f3-2f1f1f1f1f1f.jpg' },
-      { score: 82, source: '8234234e-f123-4234-234f-234234234234.jpg' },
-      { score: 15, source: '15151515-5151-5151-1515-151515151515.jpg' },
-      { score: 61, source: '61616161-6161-6161-6161-616161616161.jpg' },
-      { score: 99, source: '99999999-9999-9999-9999-999999999999.jpg' },
+      { score: 37, source: '0e8c3785-7bb6-4265-ac02-38c21b398f4f.jpg' },
+      { score: 82, source: '1e3f8cb4-0b94-4312-8ff8-ad91cec3552b.jpg' },
+      { score: 15, source: '41fbc14a-207d-4fc9-8ec1-fc166560c589.jpg' },
+      { score: 61, source: '4a2573da-c4d8-4cd8-ac4f-ae4f966fb2e2.jpg' },
+      { score: 99, source: '53c4cd45-01ff-4bfa-999b-ee18b04a0da1.jpg' },
+      { score: 85, source: '71365478-211c-4e18-9851-eb9b9040e4fe.jpg' },
+      { score: 11, source: '81957342-b67d-4cd4-9c64-e88cdcb921b8.jpg' },
+      { score: 67, source: 'b4ba1e55-d2cb-44e7-a167-6b3fbc022608.jpg' },
     ];
-    const sortByScore = (a, b) => b.score - a.score;
+    const sortByScore = (a: { score: number }, b: { score: number }) =>
+      b.score - a.score;
     const sortedByScoreMock = mockData.sort(sortByScore);
-    const topThree = sortedByScoreMock.slice(0,3);
-    const imagesSource = topThree.map((data)=>`https://blobhell.blob.core.windows.net/pictures/${inputClientId}/${data.source}`);
+    const topThree = sortedByScoreMock.slice(0, 3);
+    const imagesSource = topThree.map(
+      (data) =>
+        `https://blobhell.blob.core.windows.net/pictures/${inputClientId}/${data.source}`,
+    );
 
-    await this.updateJobResultLink({id: jobID,resultLinks: imagesSource})
+    await this.updateJobResultLink({ id: jobID, resultLinks: imagesSource });
 
     return imagesSource;
     // https://blobhell.blob.core.windows.net/pictures/gay_sex/0e8c3785-7bb6-4265-ac02-38c21b398f4f.jpg
@@ -169,7 +234,7 @@ export class JobService {
 
     var { resource } = await this.jobContainer.items.create(newJob);
 
-    this.jobQuery('gay_sex',resource.id)
+    this.jobQuery('gay_sex', resource.id);
 
     return resource;
   }
