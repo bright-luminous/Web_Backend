@@ -117,7 +117,7 @@ export class JobService {
     page = page - 1;
     const offset = page * pageSize;
     const limit = pageSize;
-    var sqlQuery = `SELECT * FROM jobContainer1 j OFFSET ${offset} LIMIT ${limit}`;
+    var sqlQuery = `SELECT * FROM jobContainer1 j ORDER BY j._ts DESC OFFSET ${offset} LIMIT ${limit}`;
 
     var consmosResults = await this.jobContainer?.items
       ?.query<JobEntity>(sqlQuery)
