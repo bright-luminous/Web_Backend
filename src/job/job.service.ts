@@ -28,7 +28,7 @@ export class JobService {
   ) {}
 
   async getJobs() {
-    var sqlQuery = 'select * from jobContainer1';
+    var sqlQuery = 'select * from jobContainer1 j ORDER BY j._ts DESC';
 
     var consmosResults = await this.jobContainer?.items
       ?.query<JobEntity>(sqlQuery)
@@ -40,6 +40,7 @@ export class JobService {
         status: value.status,
         jobPeriodStart: value.jobPeriodStart,
         jobPeriodEnd: value.jobPeriodEnd,
+        createAt: value.createAt,
         camera: value.camera,
         description: value.description,
         results: value.results,
@@ -61,6 +62,7 @@ export class JobService {
         status: value.status,
         jobPeriodStart: value.jobPeriodStart,
         jobPeriodEnd: value.jobPeriodEnd,
+        createAt: value.createAt,
         camera: value.camera,
         description: value.description,
         results: value.results,
@@ -102,6 +104,7 @@ export class JobService {
         status: value.status,
         jobPeriodStart: value.jobPeriodStart,
         jobPeriodEnd: value.jobPeriodEnd,
+        createAt: value.createAt,
         camera: value.camera,
         description: value.description,
         results: value.results,
@@ -126,6 +129,7 @@ export class JobService {
         status: value.status,
         jobPeriodStart: value.jobPeriodStart,
         jobPeriodEnd: value.jobPeriodEnd,
+        createAt: value.createAt,
         camera: value.camera,
         description: value.description,
         results: value.results,
@@ -185,6 +189,7 @@ export class JobService {
   }
 
   async jobQuery(inputDescription: string, inputClientId: string, jobID: string) {
+    this.updateJobStatus({id:jobID,status:JobStatus.WORKING})
     const uri = `https://tps-func-test.azurewebsites.net/api/query`;
 
       const response = await axios.get(uri,{
@@ -215,6 +220,7 @@ export class JobService {
     newJob.status = JobStatus.WAITING;
     newJob.jobPeriodStart = jobDetails.jobPeriodStart;
     newJob.jobPeriodEnd = jobDetails.jobPeriodEnd;
+    newJob.createAt = new Date(new Date().toISOString());
     newJob.description = jobDetails.description;
     newJob.camera = jobDetails.camera;
 
@@ -259,6 +265,8 @@ export class JobService {
           { op: 'add', path: '/results', value: updateJobDetails.resultLinks },
         ],
       });
+
+    this.updateJobStatus({id:updateJobDetails.id,status:JobStatus.DONE})
 
     return resource;
   }

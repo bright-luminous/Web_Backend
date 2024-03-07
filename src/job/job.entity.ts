@@ -24,6 +24,9 @@ export class JobEntity {
     @Column({ type: "timestamp" })
     jobPeriodEnd: Date;
 
+    @Column({ type: "timestamp" })
+    createAt: Date;
+
     @Column({ type: "string" })
     camera: string;
 
