@@ -12,14 +12,7 @@ import { Container } from '@azure/cosmos';
 import { InjectModel } from '@nestjs/azure-database';
 import axios from 'axios';
 import { BlobServiceClient } from '@azure/storage-blob';
-import {
-  createWriteStream,
-  mkdirSync,
-  readFileSync,
-  rmSync,
-} from 'fs';
-import { v4 } from 'uuid';
-import * as JSZip from 'jszip';
+import { createWriteStream, mkdirSync, readFileSync, rmSync } from 'fs';
 
 @Injectable()
 export class JobService {
@@ -152,8 +145,7 @@ export class JobService {
     }
     const containerName = splitUrlArr[0][3];
 
-    const queryId = v4();
-    mkdirSync(`sample-${queryId}`);
+    mkdirSync(`sample-${jobID}`);
 
     const connStr =
       'DefaultEndpointsProtocol=https;AccountName=blobhell;AccountKey=Zhj7QSoSXa+yWavz9BBH23zhwLV/oI1cUhbos70j1Dm38bclGOufBrQ9PuZjimICFlcYW3/+AzQE+AStiCZ2Xw==;EndpointSuffix=core.windows.net';
@@ -164,40 +156,46 @@ export class JobService {
 
     for await (const item of splitUrlArr) {
       const blobClient = containerClient.getBlobClient(`${item[4]}/${item[5]}`);
-      await blobClient.downloadToFile(`sample-${queryId}/${item[5]}`);
-      imgNames.push(`sample-${queryId}/${item[5]}`);
+      await blobClient.downloadToFile(`sample-${jobID}/${item[5]}`);
+      imgNames.push(`sample-${jobID}/${item[5]}`);
     }
 
-    const zip = new JSZip();
-      const img = zip.folder(`sample-${queryId}`);
-      for (const image of imgNames) {
-        const imageData = readFileSync(image);
-        img.file(image, imageData);
-      }
-      zip
-        .generateNodeStream({ type: 'nodebuffer', streamFiles: true })
-        .pipe(createWriteStream(`zipArchive/sample-${queryId}.zip`))
+    var output = createWriteStream(`zipArchive/sample-${jobID}.zip`);
+    var archiver2 = require('archiver');
+    var archive = archiver2('zip');
 
-      rmSync(`sample-${queryId}`, { recursive: true, force: true });
-      await this.sleep(1000);
-      return `sample-${queryId}`;
+    archive.on('error', function (err) {
+      throw err;
+    });
 
+    archive.pipe(output);
+    archive.directory(`sample-${jobID}`, `sample-${jobID}`);
+    archive.finalize();
+
+    await this.sleep(1000);
+
+    rmSync(`sample-${jobID}`, { recursive: true, force: true });
+    return `sample-${jobID}`;
   }
 
   sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
-  async jobQuery(inputDescription: string, inputClientId: string, jobID: string) {
-    this.updateJobStatus({id:jobID,status:JobStatus.WORKING})
+  async jobQuery(
+    inputDescription: string,
+    inputClientId: string,
+    jobID: string,
+  ) {
+    this.updateJobStatus({ id: jobID, status: JobStatus.WORKING });
     const uri = `https://tps-func-test.azurewebsites.net/api/query`;
 
-      const response = await axios.get(uri,{
-        params: {
-          clientId: inputClientId,
-          description: inputDescription
-        },
-      });
+    const response = await axios.get(uri, {
+      params: {
+        clientId: inputClientId,
+        description: inputDescription,
+      },
+    });
     const sortByScore = (a: { score: number }, b: { score: number }) =>
       b.score - a.score;
     const sortedByScoreMock = response.data.sort(sortByScore);
@@ -226,7 +224,7 @@ export class JobService {
 
     var { resource } = await this.jobContainer.items.create(newJob);
 
-    this.jobQuery(jobDetails.description ,jobDetails.camera, resource.id);
+    this.jobQuery(jobDetails.description, jobDetails.camera, resource.id);
 
     return resource;
   }
@@ -266,7 +264,7 @@ export class JobService {
         ],
       });
 
-    this.updateJobStatus({id:updateJobDetails.id,status:JobStatus.DONE})
+    this.updateJobStatus({ id: updateJobDetails.id, status: JobStatus.DONE });
 
     return resource;
   }
