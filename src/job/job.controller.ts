@@ -56,8 +56,9 @@ export class JobController {
   getJobAsPage(
     @Query('page') page: number,
     @Query('pageSize') pageSize: number,
+    @Query('jobName') jobName: string,
   ) {
-    return this.jobService.getJobAsPages(page, pageSize);
+    return this.jobService.getJobAsPages(page, pageSize, jobName);
   }
 
   @Get('trigger')

@@ -106,11 +106,15 @@ export class JobService {
     return final;
   }
 
-  async getJobAsPages(page: number, pageSize: number) {
+  async getJobAsPages(page: number, pageSize: number, jobName?: string) {
     page = page - 1;
     const offset = page * pageSize;
     const limit = pageSize;
     var sqlQuery = `SELECT * FROM jobContainer1 j ORDER BY j._ts DESC OFFSET ${offset} LIMIT ${limit}`;
+
+    if(jobName){
+      sqlQuery = `SELECT * FROM jobContainer1 j WHERE j.jobName LIKE "%${jobName}%" ORDER BY j._ts DESC OFFSET ${offset} LIMIT ${limit}`;
+    }
 
     var consmosResults = await this.jobContainer?.items
       ?.query<JobEntity>(sqlQuery)
