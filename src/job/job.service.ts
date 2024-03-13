@@ -209,7 +209,7 @@ export class JobService {
         `https://blobhell.blob.core.windows.net/pictures/${data.source}`,
     );
 
-    if(topThree[0].score < 40){
+    if(topThree[0].score < 35){
       this.updateJobStatus({ id: jobID, status: JobStatus.FAILED });
       await this.updateJobResultLink({ id: jobID, resultLinks: [] });
       return "fail to find the target"
