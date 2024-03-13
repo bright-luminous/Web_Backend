@@ -209,11 +209,16 @@ export class JobService {
         `https://blobhell.blob.core.windows.net/pictures/${data.source}`,
     );
 
+    if(topThree[0].score < 40){
+      this.updateJobStatus({ id: jobID, status: JobStatus.FAILED });
+      await this.updateJobResultLink({ id: jobID, resultLinks: [] });
+      return "fail to find the target"
+    }
+
+    this.updateJobStatus({ id: jobID, status: JobStatus.DONE });
     await this.updateJobResultLink({ id: jobID, resultLinks: imagesSource });
 
     return imagesSource;
-    // https://blobhell.blob.core.windows.net/pictures/gay_sex/0e8c3785-7bb6-4265-ac02-38c21b398f4f.jpg
-    // url/pictures/clientID/source
   }
 
   async createJob(jobDetails: CreateJobParams) {
@@ -267,9 +272,6 @@ export class JobService {
           { op: 'add', path: '/results', value: updateJobDetails.resultLinks },
         ],
       });
-
-    this.updateJobStatus({ id: updateJobDetails.id, status: JobStatus.DONE });
-
     return resource;
   }
 
