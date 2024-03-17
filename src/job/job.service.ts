@@ -192,7 +192,8 @@ export class JobService {
     jobID: string,
   ) {
     this.updateJobStatus({ id: jobID, status: JobStatus.WORKING });
-    const uri = `https://tps-func-test.azurewebsites.net/api/query`;
+    // const uri = `https://tps-func-test.azurewebsites.net/api/query`;
+    const uri = `http://localhost:8000/query`;
 
     const response = await axios.get(uri, {
       params: {
