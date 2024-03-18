@@ -148,6 +148,7 @@ export class JobService {
       splitUrlArr.push(source.split('/'));
     }
     const containerName = splitUrlArr[0][3];
+    console.log(splitUrlArr[0][9])
 
     mkdirSync(`sample-${jobID}`);
 
@@ -159,8 +160,8 @@ export class JobService {
     let imgNames = [];
 
     for await (const item of splitUrlArr) {
-      const blobClient = containerClient.getBlobClient(`${item[4]}/${item[5]}`);
-      await blobClient.downloadToFile(`sample-${jobID}/${item[5]}`);
+      const blobClient = containerClient.getBlobClient(`${item[4]}/${item[5]}/${item[6]}/${item[7]}/${item[8]}/${item[9]}`);
+      await blobClient.downloadToFile(`sample-${jobID}/${item[9]}`);
       imgNames.push(`sample-${jobID}/${item[5]}`);
     }
 
@@ -201,20 +202,21 @@ export class JobService {
         description: inputDescription,
       },
     });
-    const sortByScore = (a: { score: number }, b: { score: number }) =>
-      b.score - a.score;
-    const sortedByScoreMock = response.data.sort(sortByScore);
-    const topThree = sortedByScoreMock.slice(0, 3);
-    const imagesSource = topThree.map(
-      (data) =>
-        `https://blobhell.blob.core.windows.net/pictures/${data.source}`,
-    );
 
-    if(topThree[0].score < 35){
+    if(response.status != 200){
       this.updateJobStatus({ id: jobID, status: JobStatus.FAILED });
       await this.updateJobResultLink({ id: jobID, resultLinks: [] });
       return "fail to find the target"
     }
+
+    const sortByScore = (a: { score: number }, b: { score: number }) =>
+      b.score - a.score;
+    const sortedByScoreMock = response.data.sort(sortByScore);
+    const topThree = sortedByScoreMock.slice(0, 10);
+    const imagesSource = topThree.map(
+      (data) =>
+        `https://blobhell.blob.core.windows.net/frames/${data.source}`,
+    );
 
     this.updateJobStatus({ id: jobID, status: JobStatus.DONE });
     await this.updateJobResultLink({ id: jobID, resultLinks: imagesSource });
