@@ -148,7 +148,6 @@ export class JobService {
       splitUrlArr.push(source.split('/'));
     }
     const containerName = splitUrlArr[0][3];
-    console.log(splitUrlArr[0][9])
 
     mkdirSync(`sample-${jobID}`);
 
