@@ -136,33 +136,28 @@ export class JobService {
   }
 
   async getResultPic(jobID: string) {
-    var sqlQuery = `SELECT * FROM jobContainer1 j WHERE j.id="${jobID}"`;
-
-    var consmosResults = await this.jobContainer?.items
-      ?.query<JobEntity>(sqlQuery)
-      .fetchAll();
-
-    var urlArr = consmosResults.resources[0].results;
-    let splitUrlArr = [];
-    for await (const source of urlArr) {
-      splitUrlArr.push(source.split('/'));
-    }
-    const containerName = splitUrlArr[0][3];
+    const ResultContainerName = "results"
 
     mkdirSync(`sample-${jobID}`);
 
     const connStr =
       'DefaultEndpointsProtocol=https;AccountName=blobhell;AccountKey=Zhj7QSoSXa+yWavz9BBH23zhwLV/oI1cUhbos70j1Dm38bclGOufBrQ9PuZjimICFlcYW3/+AzQE+AStiCZ2Xw==;EndpointSuffix=core.windows.net';
     const blobServiceClient = BlobServiceClient.fromConnectionString(connStr);
-    const containerClient = blobServiceClient.getContainerClient(containerName);
+    const resultContainerClient = blobServiceClient.getContainerClient(ResultContainerName);
+    const blobClient = resultContainerClient.getBlobClient(`${jobID}/result.json`);
+    await blobClient.downloadToFile(`sample-${jobID}/result.json`);
 
-    let imgNames = [];
+    const jsonSource = JSON.parse(readFileSync(`sample-${jobID}/result.json`, 'utf8'));
 
-    for await (const item of splitUrlArr) {
-      const blobClient = containerClient.getBlobClient(`${item[4]}/${item[5]}/${item[6]}/${item[7]}/${item[8]}/${item[9]}`);
-      await blobClient.downloadToFile(`sample-${jobID}/${item[9]}`);
-      imgNames.push(`sample-${jobID}/${item[5]}`);
+    const pictureContainerName = "frames"
+    const pictureContainerClient = blobServiceClient.getContainerClient(pictureContainerName);
+
+    for (let i = 0; i < 10; i++) {
+      const blobClient = pictureContainerClient.getBlobClient(`${jsonSource[i].source}`);
+      await blobClient.downloadToFile(`sample-${jobID}/${jsonSource[i].source.split('/')[5]}`);
     }
+
+    rmSync(`sample-${jobID}/result.json`)
 
     var output = createWriteStream(`zipArchive/sample-${jobID}.zip`);
     var archiver2 = require('archiver');
@@ -176,7 +171,7 @@ export class JobService {
     archive.directory(`sample-${jobID}`, `sample-${jobID}`);
     archive.finalize();
 
-    await this.sleep(1000);
+    await this.sleep(5000);
 
     rmSync(`sample-${jobID}`, { recursive: true, force: true });
     return `sample-${jobID}`;
