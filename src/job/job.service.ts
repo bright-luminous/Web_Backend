@@ -171,7 +171,7 @@ export class JobService {
     archive.directory(`sample-${jobID}`, `sample-${jobID}`);
     archive.finalize();
 
-    await this.sleep(5000);
+    await this.sleep(1000);
 
     rmSync(`sample-${jobID}`, { recursive: true, force: true });
     return `sample-${jobID}`;
