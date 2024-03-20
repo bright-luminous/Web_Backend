@@ -199,6 +199,7 @@ export class JobService {
       params: {
         clientId: inputClientId,
         description: inputDescription,
+        jobId: jobID
       },
     });
 
@@ -220,7 +221,7 @@ export class JobService {
     this.updateJobStatus({ id: jobID, status: JobStatus.WORKING });
     // await this.updateJobResultLink({ id: jobID, resultLinks: imagesSource });
 
-    return response;
+    return response.data;
   }
 
   async createJob(jobDetails: CreateJobParams) {
