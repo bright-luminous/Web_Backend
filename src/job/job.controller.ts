@@ -61,6 +61,13 @@ export class JobController {
     return this.jobService.getJobAsPages(page, pageSize, jobName);
   }
 
+  @Get('progress')
+  getJobProgress(
+    @Query('jobID') jobID: string
+  ) {
+    return this.jobService.getJobProgress(jobID);
+  }
+
   @Get('trigger')
   getJobQuery(
     @Query('description') description: string,

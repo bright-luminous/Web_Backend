@@ -112,7 +112,7 @@ export class JobService {
     const limit = pageSize;
     var sqlQuery = `SELECT * FROM jobContainer1 j ORDER BY j._ts DESC OFFSET ${offset} LIMIT ${limit}`;
 
-    if(jobName){
+    if (jobName) {
       sqlQuery = `SELECT * FROM jobContainer1 j WHERE j.jobName LIKE "%${jobName}%" ORDER BY j._ts DESC OFFSET ${offset} LIMIT ${limit}`;
     }
 
@@ -135,29 +135,68 @@ export class JobService {
     return { data: final, totalCount: (await this.getJobCount()).resources[0] };
   }
 
+  async getJobProgress(jobID: string) {
+    const ResultContainerName = 'results';
+    const connStr =
+      'DefaultEndpointsProtocol=https;AccountName=blobhell;AccountKey=Zhj7QSoSXa+yWavz9BBH23zhwLV/oI1cUhbos70j1Dm38bclGOufBrQ9PuZjimICFlcYW3/+AzQE+AStiCZ2Xw==;EndpointSuffix=core.windows.net';
+    const blobServiceClient = BlobServiceClient.fromConnectionString(connStr);
+    const resultContainerClient =
+      blobServiceClient.getContainerClient(ResultContainerName);
+    const blobClient = resultContainerClient.getBlobClient(
+      `${jobID}/jobProcess.json`,
+    );
+    blobClient.download();
+    const downloadBlockBlobResponse = await blobClient.download(0);
+    console.log('\nDownloaded blob content...');
+    console.log(
+      '\t',
+      this.streamToString(downloadBlockBlobResponse.readableStreamBody),
+    );
+    return this.streamToString(downloadBlockBlobResponse.readableStreamBody)
+  }
+
+  streamToString (stream) {
+    const chunks = [];
+    return new Promise((resolve, reject) => {
+      stream.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
+      stream.on('error', (err) => reject(err));
+      stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+    })
+  }
+
   async getResultPic(jobID: string) {
-    const ResultContainerName = "results"
+    const ResultContainerName = 'results';
 
     mkdirSync(`sample-${jobID}`);
 
     const connStr =
       'DefaultEndpointsProtocol=https;AccountName=blobhell;AccountKey=Zhj7QSoSXa+yWavz9BBH23zhwLV/oI1cUhbos70j1Dm38bclGOufBrQ9PuZjimICFlcYW3/+AzQE+AStiCZ2Xw==;EndpointSuffix=core.windows.net';
     const blobServiceClient = BlobServiceClient.fromConnectionString(connStr);
-    const resultContainerClient = blobServiceClient.getContainerClient(ResultContainerName);
-    const blobClient = resultContainerClient.getBlobClient(`${jobID}/result.json`);
+    const resultContainerClient =
+      blobServiceClient.getContainerClient(ResultContainerName);
+    const blobClient = resultContainerClient.getBlobClient(
+      `${jobID}/result.json`,
+    );
     await blobClient.downloadToFile(`sample-${jobID}/result.json`);
 
-    const jsonSource = JSON.parse(readFileSync(`sample-${jobID}/result.json`, 'utf8'));
+    const jsonSource = JSON.parse(
+      readFileSync(`sample-${jobID}/result.json`, 'utf8'),
+    );
 
-    const pictureContainerName = "frames"
-    const pictureContainerClient = blobServiceClient.getContainerClient(pictureContainerName);
+    const pictureContainerName = 'frames';
+    const pictureContainerClient =
+      blobServiceClient.getContainerClient(pictureContainerName);
 
     for (let i = 0; i < 10; i++) {
-      const blobClient = pictureContainerClient.getBlobClient(`${jsonSource[i].source}`);
-      await blobClient.downloadToFile(`sample-${jobID}/${jsonSource[i].source.split('/')[5]}`);
+      const blobClient = pictureContainerClient.getBlobClient(
+        `${jsonSource[i].source}`,
+      );
+      await blobClient.downloadToFile(
+        `sample-${jobID}/${jsonSource[i].source.split('/')[5]}`,
+      );
     }
 
-    rmSync(`sample-${jobID}/result.json`)
+    rmSync(`sample-${jobID}/result.json`);
 
     var output = createWriteStream(`zipArchive/sample-${jobID}.zip`);
     var archiver2 = require('archiver');
@@ -194,14 +233,14 @@ export class JobService {
       params: {
         clientId: inputClientId,
         description: inputDescription,
-        jobId: jobID
+        jobId: jobID,
       },
     });
 
-    if(response.status != 200){
+    if (response.status != 200) {
       this.updateJobStatus({ id: jobID, status: JobStatus.FAILED });
       // await this.updateJobResultLink({ id: jobID, resultLinks: [] });
-      return "unable to start the job"
+      return 'unable to start the job';
     }
 
     // const sortByScore = (a: { score: number }, b: { score: number }) =>
