@@ -90,8 +90,8 @@ export class JobController {
   }
 
   @Post()
-  createJob(@Body() createUserDto: CreateJobParams) {
-    return this.jobService.createJob(createUserDto);
+  createJob(@Body() createJobDto: CreateJobParams) {
+    return this.jobService.createJob(createJobDto);
   }
 
   @Put()

@@ -192,8 +192,8 @@ export class JobService {
     jobID: string,
   ) {
     this.updateJobStatus({ id: jobID, status: JobStatus.WORKING });
-    // const uri = `https://tps-func-test.azurewebsites.net/api/query`;
-    const uri = `http://localhost:8000/query`;
+    const uri = `https://capstone-model.lemonbush-60506fc5.southeastasia.azurecontainerapps.io/query`;
+    // const uri = `http://localhost:8000/query`;
 
     const response = await axios.get(uri, {
       params: {
@@ -204,23 +204,23 @@ export class JobService {
 
     if(response.status != 200){
       this.updateJobStatus({ id: jobID, status: JobStatus.FAILED });
-      await this.updateJobResultLink({ id: jobID, resultLinks: [] });
-      return "fail to find the target"
+      // await this.updateJobResultLink({ id: jobID, resultLinks: [] });
+      return "unable to start the job"
     }
 
-    const sortByScore = (a: { score: number }, b: { score: number }) =>
-      b.score - a.score;
-    const sortedByScoreMock = response.data.sort(sortByScore);
-    const topThree = sortedByScoreMock.slice(0, 10);
-    const imagesSource = topThree.map(
-      (data) =>
-        `https://blobhell.blob.core.windows.net/frames/${data.source}`,
-    );
+    // const sortByScore = (a: { score: number }, b: { score: number }) =>
+    //   b.score - a.score;
+    // const sortedByScoreMock = response.data.sort(sortByScore);
+    // const topThree = sortedByScoreMock.slice(0, 10);
+    // const imagesSource = topThree.map(
+    //   (data) =>
+    //     `https://blobhell.blob.core.windows.net/frames/${data.source}`,
+    // );
 
-    this.updateJobStatus({ id: jobID, status: JobStatus.DONE });
-    await this.updateJobResultLink({ id: jobID, resultLinks: imagesSource });
+    this.updateJobStatus({ id: jobID, status: JobStatus.WORKING });
+    // await this.updateJobResultLink({ id: jobID, resultLinks: imagesSource });
 
-    return imagesSource;
+    return response;
   }
 
   async createJob(jobDetails: CreateJobParams) {
