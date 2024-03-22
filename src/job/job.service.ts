@@ -145,6 +145,11 @@ export class JobService {
     const blobClient = resultContainerClient.getBlobClient(
       `${jobID}/jobProcess.json`,
     );
+
+    if(await blobClient.exists() !== true){
+      return "can't read jobProcess.json"
+    }
+
     blobClient.download();
     const downloadBlockBlobResponse = await blobClient.download(0);
     console.log('\nDownloaded blob content...');
@@ -175,8 +180,12 @@ export class JobService {
     const blobClient = resultContainerClient.getBlobClient(
       `${jobID}/result.json`,
     );
-    mkdirSync(`sample-${jobID}`);
 
+    if(await blobClient.exists() !== true){
+      return "can't read result.json"
+    }
+
+    mkdirSync(`sample-${jobID}`);
     await blobClient.downloadToFile(`sample-${jobID}/result.json`);
 
     const jsonSource = JSON.parse(
