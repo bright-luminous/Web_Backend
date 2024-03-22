@@ -183,6 +183,10 @@ export class JobService {
       readFileSync(`sample-${jobID}/result.json`, 'utf8'),
     );
 
+    if(typeof jsonSource == 'undefined'){
+      return "can't read result.json"
+    }
+
     const pictureContainerName = 'frames';
     const pictureContainerClient =
       blobServiceClient.getContainerClient(pictureContainerName);
