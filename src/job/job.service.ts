@@ -235,27 +235,18 @@ export class JobService {
         description: inputDescription,
         jobId: jobID,
       },
-    });
-
-    if (response.status != 200) {
-      this.updateJobStatus({ id: jobID, status: JobStatus.FAILED });
-      // await this.updateJobResultLink({ id: jobID, resultLinks: [] });
-      return 'unable to start the job';
-    }
-
-    // const sortByScore = (a: { score: number }, b: { score: number }) =>
-    //   b.score - a.score;
-    // const sortedByScoreMock = response.data.sort(sortByScore);
-    // const topThree = sortedByScoreMock.slice(0, 10);
-    // const imagesSource = topThree.map(
-    //   (data) =>
-    //     `https://blobhell.blob.core.windows.net/frames/${data.source}`,
-    // );
+    }).catch(function (error) {
+      if (error.response) {
+        this.updateJobStatus({ id: jobID, status: JobStatus.FAILED });
+        console.log(error.response.data);
+        console.log(error.response.status);
+        console.log(error.response.headers);
+        return 'unable to start the job';
+      }});
 
     this.updateJobStatus({ id: jobID, status: JobStatus.WORKING });
-    // await this.updateJobResultLink({ id: jobID, resultLinks: imagesSource });
 
-    return response.data;
+    return response.toString();
   }
 
   async createJob(jobDetails: CreateJobParams) {
