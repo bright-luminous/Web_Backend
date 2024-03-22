@@ -235,14 +235,13 @@ export class JobService {
         description: inputDescription,
         jobId: jobID,
       },
-    }).catch(function (error) {
-      if (error.response) {
-        this.updateJobStatus({ id: jobID, status: JobStatus.FAILED });
-        console.log(error.response.data);
-        console.log(error.response.status);
-        console.log(error.response.headers);
-        return 'unable to start the job';
-      }});
+      validateStatus: () => true
+    })
+
+    if(response.status != 200){
+      this.updateJobStatus({ id: jobID, status: JobStatus.FAILED });
+      return 'unable to start the job';
+    }
 
     this.updateJobStatus({ id: jobID, status: JobStatus.WORKING });
 
