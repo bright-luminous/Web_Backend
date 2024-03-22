@@ -152,22 +152,20 @@ export class JobService {
       '\t',
       this.streamToString(downloadBlockBlobResponse.readableStreamBody),
     );
-    return this.streamToString(downloadBlockBlobResponse.readableStreamBody)
+    return this.streamToString(downloadBlockBlobResponse.readableStreamBody);
   }
 
-  streamToString (stream) {
+  streamToString(stream) {
     const chunks = [];
     return new Promise((resolve, reject) => {
       stream.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
       stream.on('error', (err) => reject(err));
       stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
-    })
+    });
   }
 
   async getResultPic(jobID: string) {
     const ResultContainerName = 'results';
-
-    mkdirSync(`sample-${jobID}`);
 
     const connStr =
       'DefaultEndpointsProtocol=https;AccountName=blobhell;AccountKey=Zhj7QSoSXa+yWavz9BBH23zhwLV/oI1cUhbos70j1Dm38bclGOufBrQ9PuZjimICFlcYW3/+AzQE+AStiCZ2Xw==;EndpointSuffix=core.windows.net';
@@ -177,6 +175,8 @@ export class JobService {
     const blobClient = resultContainerClient.getBlobClient(
       `${jobID}/result.json`,
     );
+    mkdirSync(`sample-${jobID}`);
+
     await blobClient.downloadToFile(`sample-${jobID}/result.json`);
 
     const jsonSource = JSON.parse(
@@ -235,10 +235,10 @@ export class JobService {
         description: inputDescription,
         jobId: jobID,
       },
-      validateStatus: () => true
-    })
+      validateStatus: () => true,
+    });
 
-    if(response.status != 200){
+    if (response.status != 200) {
       this.updateJobStatus({ id: jobID, status: JobStatus.FAILED });
       return 'unable to start the job';
     }
