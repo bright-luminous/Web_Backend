@@ -84,6 +84,9 @@ export class JobController {
         'Content-Type': 'application/zip',
         'Content-Disposition': `attachment; filename="${zipPath}.zip"`
     });
+    if(zipPath == "can't read result.json"){
+      return zipPath
+    }
     const fileStream = createReadStream(`zipArchive/${zipPath}.zip`).pipe(res);
 
       fileStream.on('error', (err)=> {
